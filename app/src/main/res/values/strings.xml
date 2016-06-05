@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">BluetoothShowcase</string>
+    <string name="bt_not_supported">Bluetooth not supported</string>
+    <string name="bt_enabled">Bluetooth enabled</string>
+    <string name="bt_must_be_enabled">Bluetooth must be enabled</string>
+    <string name="title_paired_devices">Known Devices</string>
+    <string name="select_device_label">Select device</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="no_bt_devices_found">No devices found</string>
+    <string name="scanning_title">Scanning devices...</string>
+    <string name="scan_for_devices">Scan for devices</string>
+    <string name="turn_on_led">Turn on LED</string>
+    <string name="turn_off_led">Turn off LED</string>
+    <string name="make_led_blink">Make LED blink</string>
+    <string name="red_led_label">Red LED</string>
+    <string name="yellow_led_label">Yellow LED</string>
+    <string name="green_led_label">Green LED</string>
+    <string name="connecting_to_title">Connecting to</string>
+    <string name="connected_to_title">Connected to</string>
+    <string name="on">ON</string>
+    <string name="off">OFF</string>
+    <string name="connect_to_device_label">Connect to device</string>
+</resources>

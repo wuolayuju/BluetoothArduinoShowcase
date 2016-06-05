@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/DialogContentStyle">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title_paired_devices"
+        style="@style/TitleListView"/>
+
+    <View
+        style="@style/DialogTitleDivider"
+        />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/paired_devices_listview"
+        tools:listitem="@layout/bt_device_name"
+        style="@style/DialogListView"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title_other_devices"
+        android:layout_marginTop="5dp"
+        style="@style/TitleListView"/>
+
+    <View
+        style="@style/DialogTitleDivider"
+        />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/new_devices_listview"
+        tools:listitem="@layout/bt_device_name"
+        android:visibility="gone"
+        style="@style/DialogListView"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/scan_for_devices"
+        android:id="@+id/scan_devices_button" />
+</LinearLayout>

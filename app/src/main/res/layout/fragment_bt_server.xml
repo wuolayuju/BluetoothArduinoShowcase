@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/info_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="20dp">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/connect_to_device_label"
+            android:id="@+id/attempt_connect_device_button" />
+        <TextView
+            android:id="@+id/bt_device_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Device Info" />
+
+
+
+
+    </LinearLayout>
+
+    <ToggleButton
+        android:id="@+id/red_led_togglebutton"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:background="@color/red"
+        android:layout_below="@+id/info_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="20dp"
+        style="@style/LedToggleButton"/>
+
+    <SeekBar
+        android:id="@+id/red_led_brightness_seekbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:max="255"
+        android:layout_alignTop="@+id/red_led_togglebutton"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/red_led_togglebutton" />
+
+    <ToggleButton
+        android:id="@+id/yellow_led_togglebutton"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:background="@color/yellow"
+        android:layout_below="@+id/red_led_togglebutton"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="20dp"
+        style="@style/LedToggleButton" />
+
+    <SeekBar
+        android:id="@+id/yellow_led_brightness_seekbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:max="255"
+        android:layout_alignTop="@+id/yellow_led_togglebutton"
+        android:layout_alignEnd="@+id/red_led_brightness_seekbar"
+        android:layout_toEndOf="@+id/yellow_led_togglebutton" />
+
+    <ToggleButton
+        android:id="@+id/green_led_togglebutton"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:background="@color/green"
+        android:layout_below="@+id/yellow_led_togglebutton"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="20dp"
+        style="@style/LedToggleButton"/>
+
+    <SeekBar
+        android:id="@+id/green_led_brightness_seekbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:max="255"
+        android:layout_below="@+id/yellow_led_togglebutton"
+        android:layout_alignEnd="@+id/yellow_led_brightness_seekbar"
+        android:layout_toEndOf="@+id/green_led_togglebutton" />
+
+</RelativeLayout>

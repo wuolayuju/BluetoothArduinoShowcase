@@ -1,0 +1,44 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:dialogTitle">@string/select_device_label</item>
+    </style>
+
+    <style name="DialogContentStyle" parent="AppTheme">
+        <item name="android:padding">20dp</item>
+    </style>
+
+    <style name="TitleListView">
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+    </style>
+
+    <style name="DialogTitleDivider">
+        <item name="android:layout_height">2dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:background">@color/colorAccent</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:layout_marginTop">5dp</item>
+    </style>
+
+    <style name="DialogListView">
+        <item name="android:divider">#90909090</item>
+        <item name="android:dividerHeight">1dp</item>
+    </style>
+
+    <style name="LedToggleButton">
+        <item name="android:text">@string/on</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="android:textOn">@string/on</item>
+        <item name="android:textOff">@string/off</item>
+    </style>
+
+</resources>
