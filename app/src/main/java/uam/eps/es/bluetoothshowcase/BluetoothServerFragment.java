@@ -13,13 +13,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 import uam.eps.es.bluetoothshowcase.utils.AndroidUtils;
+import uam.eps.es.bluetoothshowcase.utils.Constants;
 
 /**
  * Created by Ari on 04/06/2016.
@@ -32,23 +35,25 @@ public class BluetoothServerFragment extends Fragment {
     private final String TAG = this.getClass().getSimpleName();
 
     private TextView mBtDeviceInfoTextView;
+    private Button mReconnectButton;
+    private ToggleButton mRedLEDTogglebutton;
+    private ToggleButton mYellowLEDTogglebutton;
+    private ToggleButton mGreenLEDTogglebutton;
     private SeekBar mRedLEDSeekbar;
     private SeekBar mYellowLEDSeekbar;
     private SeekBar mGreenLEDSeekbar;
+
+    private BluetoothServiceMessageHandler mBtMessageHandler;
     private BluetoothService mBluetoothService;
 
-    private BluetoothAdapter mBluetoothAdapter;
-    private EventBus mThreadsEventBus;
-    private Button mReconnectButton;
+    private BluetoothAdapter mBluetoothAdapter;;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mThreadsEventBus = new EventBus("thread_bus");
-        mThreadsEventBus.register(this);
-
-        mBluetoothService = new BluetoothService(mThreadsEventBus);
+        mBtMessageHandler = new BluetoothServiceMessageHandler(getActivity());
+        mBluetoothService = new BluetoothService(mBtMessageHandler);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -76,6 +81,11 @@ public class BluetoothServerFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mBtDeviceInfoTextView = (TextView) view.findViewById(R.id.bt_device_info);
         mReconnectButton = (Button) view.findViewById(R.id.attempt_connect_device_button);
+
+        mRedLEDTogglebutton = (ToggleButton) view.findViewById(R.id.red_led_togglebutton);
+        mYellowLEDTogglebutton = (ToggleButton) view.findViewById(R.id.yellow_led_togglebutton);
+        mGreenLEDTogglebutton = (ToggleButton) view.findViewById(R.id.green_led_togglebutton);
+
         mRedLEDSeekbar = (SeekBar) view.findViewById(R.id.red_led_brightness_seekbar);
         mYellowLEDSeekbar = (SeekBar) view.findViewById(R.id.yellow_led_brightness_seekbar);
         mGreenLEDSeekbar = (SeekBar) view.findViewById(R.id.green_led_brightness_seekbar);
@@ -92,12 +102,39 @@ public class BluetoothServerFragment extends Fragment {
             }
         });
 
+        CompoundButton.OnCheckedChangeListener ledTogglebuttonListener = new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                int buttonId = buttonView.getId();
+                SeekBar whichSeekbar = null;
+                switch (buttonId) {
+                    case R.id.red_led_togglebutton:
+                        whichSeekbar = mRedLEDSeekbar;
+                        break;
+                    case R.id.yellow_led_togglebutton:
+                        whichSeekbar = mYellowLEDSeekbar;
+                        break;
+                    case R.id.green_led_togglebutton:
+                        whichSeekbar = mGreenLEDSeekbar;
+                        break;
+                }
+                if (whichSeekbar != null) {
+                    whichSeekbar.setProgress(isChecked ? 255 : 0);
+                }
+            }
+        };
+
+        mRedLEDTogglebutton.setOnCheckedChangeListener(ledTogglebuttonListener);
+        mYellowLEDTogglebutton.setOnCheckedChangeListener(ledTogglebuttonListener);
+        mGreenLEDTogglebutton.setOnCheckedChangeListener(ledTogglebuttonListener);
+
         SeekBar.OnSeekBarChangeListener ledBrightnessSeekbarListener = new SeekBar.OnSeekBarChangeListener() {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
-                if (mBluetoothService.state() != BluetoothServiceEvent.STATE_CONNECTED)
+                if (mBluetoothService.state() != Constants.STATE_CONNECTED)
                     return;
 
                 int seekbarId = seekBar.getId();
@@ -105,6 +142,7 @@ public class BluetoothServerFragment extends Fragment {
                 switch (seekbarId) {
                     case R.id.red_led_brightness_seekbar:
                         command += "r";
+                        mRedLEDTogglebutton.setChecked(true);
                         break;
                     case R.id.yellow_led_brightness_seekbar:
                         command += "y";
@@ -161,14 +199,6 @@ public class BluetoothServerFragment extends Fragment {
         }
     }
 
-    @Subscribe
-    public void listenForThreadEvents(BluetoothServiceEvent event) {
-        String message = event.message;
-        if (message == BluetoothServiceEvent.STATE_CONNECTED) {
-            setActivityTitleState(getString(R.string.connected_to_title) + event.extra);
-        }
-    }
-
     private void connectToBtDevice(String address) {
         Log.d(TAG, "connectToBtDevice()");
         BluetoothDevice remoteDevice = mBluetoothAdapter.getRemoteDevice(address);
@@ -199,7 +229,6 @@ public class BluetoothServerFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mThreadsEventBus.unregister(this);
         mBluetoothService.closeBluetoothService();
     }
 }

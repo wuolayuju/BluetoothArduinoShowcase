@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 
 import com.google.common.eventbus.EventBus;
@@ -13,6 +15,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
+import uam.eps.es.bluetoothshowcase.utils.Constants;
+
 /**
  * Created by Ari on 05/06/2016.
  */
@@ -21,16 +25,17 @@ public class BluetoothService {
     private final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private final String TAG = this.getClass().getSimpleName();
 
-    private String mCurrentState = BluetoothServiceEvent.STATE_DISCONNECTED;
+    private String mCurrentState = Constants.STATE_DISCONNECTED;
 
     private final BluetoothAdapter mBluetoothAdapter;
-    private final EventBus mEventbus;
+    private final BluetoothServiceMessageHandler mBtMessageHandler;
+
     private ConnectionThread mConnectionThread;
     private CommunicationThread mCommunicationThread;
 
-    BluetoothService(EventBus eventBus) {
+    BluetoothService(BluetoothServiceMessageHandler handler) {
+        mBtMessageHandler = handler;
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        mEventbus = eventBus;
     }
 
     public String state() {
@@ -66,13 +71,18 @@ public class BluetoothService {
 
         public void run() {
             Log.d(TAG, "Started ConnectionThread w/" + mmBTSocket.getRemoteDevice().getName());
-            mCurrentState = BluetoothServiceEvent.STATE_CONNECTING;
+            Message stateMessage = buildStateMessage(mmBTDevice.getName());
+
+            mCurrentState = Constants.STATE_CONNECTING;
+            stateMessage.getData().putString(Constants.MESSAGE_BT_STATE, Constants.STATE_CONNECTING);
+            mBtMessageHandler.sendMessage(stateMessage);
+
             try {
                 mmBTSocket.connect();
             } catch (IOException e) {
                 Log.e(TAG, "Unable to connect() to BT socket", e);
                 try {
-                    mCurrentState = BluetoothServiceEvent.STATE_DISCONNECTED;
+                    mCurrentState = Constants.STATE_DISCONNECTED;
                     mmBTSocket.close();
                 } catch (IOException e1) {
                     Log.e(TAG, "Failed to close() BT socket during connection failure", e1);
@@ -82,9 +92,11 @@ public class BluetoothService {
 
             if (mmBTSocket != null) {
                 Log.d(TAG, "Connection w/ " + mmBTSocket.getRemoteDevice().getName() + " established");
-                BluetoothServiceEvent msgToUIThread =
-                        new BluetoothServiceEvent(BluetoothServiceEvent.STATE_CONNECTED, mmBTDevice.getName());
-                mEventbus.post(msgToUIThread);
+
+                stateMessage = buildStateMessage(mmBTDevice.getName());
+                stateMessage.getData().putString(Constants.MESSAGE_BT_STATE, Constants.STATE_CONNECTED);
+                mBtMessageHandler.sendMessage(stateMessage);
+
                 beginBTCommunication(mmBTSocket);
             }
         }
@@ -97,6 +109,14 @@ public class BluetoothService {
                 Log.e(TAG, "BT server socket failed to close()", e);
             }
         }
+    }
+
+    private Message buildStateMessage(String deviceName) {
+        Message msg = mBtMessageHandler.obtainMessage(Constants.MESSAGE_BT_STATE_CHANGED);
+        Bundle msgData = new Bundle();
+        msgData.putString(Constants.DEVICE_NAME, deviceName);
+        msg.setData(msgData);
+        return msg;
     }
 
     private void beginBTCommunication(BluetoothSocket mmBTSocket) {
@@ -121,7 +141,7 @@ public class BluetoothService {
                 Log.e(TAG, "Unable to get socket streams", e);
             }
             mDeviceName = mmBtSocket.getRemoteDevice().getName();
-            mCurrentState = BluetoothServiceEvent.STATE_CONNECTED;
+            mCurrentState = Constants.STATE_CONNECTED;
         }
 
         @Override
@@ -131,11 +151,14 @@ public class BluetoothService {
 
             while(true) {
                 try {
-                    mmInputStream.read(inputBuffer);
-                    String inputString = new String(inputBuffer);
-                    System.out.println(inputString);
+                    int bytesRead = mmInputStream.read(inputBuffer);
+                    String inputString = new String(inputBuffer, 0, bytesRead);
+                    Log.d(TAG, "Bytes read = [" + bytesRead + "], String = '"+inputString + "'");
                 } catch (IOException e) {
                     Log.e(TAG, "Failed to read from socket w/" + mDeviceName, e);
+                    Message stateMessage = buildStateMessage(null);
+                    stateMessage.getData().putString(Constants.MESSAGE_BT_STATE, Constants.STATE_DISCONNECTED);
+                    mBtMessageHandler.sendMessage(stateMessage);
                     break;
                 }
             }

@@ -31,7 +31,7 @@ void loop() {
 
 void parseCommand(String command) {
   char whichLED = command.charAt(0);
-  String brigthnessString = command.substring(1);
+  String actionString = command.substring(1);
   int pinLED;
   switch (whichLED) {
     case 'r':
@@ -44,6 +44,6 @@ void parseCommand(String command) {
       pinLED = greenLED;
       break;
   }
-  int brigthness = brigthnessString.toInt();
+  int brigthness = actionString.toInt();
   analogWrite(pinLED, brigthness);
 }
